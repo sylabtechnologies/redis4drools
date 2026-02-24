@@ -4,10 +4,35 @@
 	<head>
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'customer.label', default: 'Customer')}" />
-		<title>Customer Profile</title>
+		<title>Update Customer Profile</title>
 		<g:if test="${newCustomer}">
 			<meta http-equiv="refresh" content="5; url=${createLink(controller: 'customer', action: 'profile', id: customer?.phone)}" />
 		</g:if>
+		<script type="text/javascript">
+			function validateCustomerForm() {
+				var firstName = document.getElementsByName('firstName')[0].value.trim();
+				var lastName = document.getElementsByName('lastName')[0].value.trim();
+				var email = document.getElementsByName('email')[0].value.trim();
+				var valid = true;
+				var msg = '';
+				if (!firstName) {
+					msg += 'First Name is required.\n';
+					valid = false;
+				}
+				if (!lastName) {
+					msg += 'Last Name is required.\n';
+					valid = false;
+				}
+				if (!email) {
+					msg += 'Email is required.\n';
+					valid = false;
+				}
+				if (!valid) {
+					alert(msg);
+				}
+				return valid;
+			}
+		</script>
 	</head>
 	<body>
 		<div id="edit-customer" class="content scaffold-edit" role="main">
@@ -22,42 +47,42 @@
 				</g:eachError>
 			</ul>
 			</g:hasErrors>
-			<g:form controller="customer" action="updateProfile" method="POST">
+			<g:form controller="customer" action="updateProfile" method="POST" onsubmit="return validateCustomerForm();">
 				<g:hiddenField name="id" value="${customer?.phone}" />
 				<g:hiddenField name="version" value="${customer?.version}" />
 				<fieldset class="buttons">
 					<g:actionSubmit class="save" action="updateProfile" value="${message(code: 'default.button.update.label', default: 'Update')}" />
 				</fieldset>
 				<fieldset class="form">
-					<div class="fieldcontain ${hasErrors(bean: customer, field: 'firstName', 'error')} ">
-						<label for="firstName">
-							<g:message code="customer.firstName.label" default="First Name" />
-                
-						</label>
-						<g:textField name="firstName" value="${customer?.firstName}" placeholder="J"/>
-					</div>
-        
-					<div class="fieldcontain ${hasErrors(bean: customer, field: 'lastName', 'error')} ">
-						<label for="lastName">
-							<g:message code="customer.lastName.label" default="Last Name" />
-                
-						</label>
-						<g:textField name="lastName" value="${customer?.lastName}" placeholder="Smith"/>
-					</div>
+					<div class="fieldcontain ${hasErrors(bean: customer, field: 'firstName', 'error')} required">
+    <label for="firstName">
+        <g:message code="customer.firstName.label" default="First Name" />
+        <span style="color:red">*</span>
+    </label>
+    <g:textField name="firstName" value="" placeholder="Enter first name" style="border-color:red;" required="true"/>
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: customer, field: 'lastName', 'error')} required">
+    <label for="lastName">
+        <g:message code="customer.lastName.label" default="Last Name" />
+        <span style="color:red">*</span>
+    </label>
+    <g:textField name="lastName" value="" placeholder="Enter last name" style="border-color:red;" required="true"/>
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: customer, field: 'phone', 'error')} required">
+    <span id="phone-label" class="property-label"><g:message code="customer.phone.label" default="Phone" /></span>
+    <span class="property-value" aria-labelledby="phone-label"><g:phone334 phone="${customer?.phone}" field="phone"/></span>
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: customer, field: 'email', 'error')} required">
+    <label for="email">
+        <g:message code="customer.email.label" default="Email" />
+        <span style="color:red">*</span>
+    </label>
+    <g:textField name="email" value="" placeholder="Enter email" style="border-color:red;" required="true"/>
+</div>
 					
-					<div class="fieldcontain ${hasErrors(bean: customer, field: 'phone', 'error')} required">
-						<span id="phone-label" class="property-label"><g:message code="customer.phone.label" default="Phone" /></span>
-						<span class="property-value" aria-labelledby="phone-label"><g:phone334 phone="${customer?.phone}" field="phone"/></span>
-					</div>
-                    
-					<div class="fieldcontain ${hasErrors(bean: customer, field: 'email', 'error')} ">
-						<label for="email">
-							<g:message code="customer.email.label" default="Email" />
-                            
-						</label>
-						<g:textField name="email" value="${customer?.email}" placeholder="your email"/>
-					</div>
-                    
 					<div class="fieldcontain ${hasErrors(bean: customer, field: 'totalPoints', 'error')} required">
 						<span id="totalPoints-label" class="property-label"><g:message code="customer.totalPoints.label" default="Total Points" /></span>
 						<span class="property-value" aria-labelledby="totalPoints-label"><g:fieldValue bean="${customer}" field="awardPoints"/></span>
