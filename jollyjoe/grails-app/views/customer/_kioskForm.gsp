@@ -7,10 +7,10 @@
 		</div>
 	</div>
 	
-	<div class="row"> <!-- Begin First Row -->
+	<div class="row">
 		<div class="col-sm-5 col-sm-offset-1" style="color: white;"> <!-- Welcome Column -->
-			<h4 style="font-family: 'Segoe Script', cursive; font-size: 2em; letter-spacing: 1px;">${welcome}</h4>
-			<p><h4 style="font-family: 'Segoe Script', cursive; font-size: 1.7em; letter-spacing: 1px;">${points}</h4></p>
+			<h4 style="font-family: 'Segoe Script', cursive; font-size: 2em; letter-spacing: 1px;">Welcome Customer!</h4>
+			<h4 style="font-family: 'Segoe Script', cursive; font-size: 1.7em; letter-spacing: 1px;">${points}</h4>
 		</div>
 		
 		<div class="col-sm-4 col-sm-offset-1" style="max-width: 350px;"> <!-- Begin Right Column, narrower -->

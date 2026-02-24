@@ -37,10 +37,17 @@ class CustomerController {
      * kiosk action
      */
     def customerLookup(Customer customerInstance) {
-        // lookup customer
-        def (customer, welcome, points) = customerService.lookup(customerInstance.phone)
-
-        render(view: 'checkin', model: [customer: customer, welcome : welcome, points: points])
+        def processedCustomer = Customer.findByPhone(customerInstance.phone)
+        if (!processedCustomer) {
+            // New customer: create with dummy info and redirect to profile update
+            def (newcustomer, welcome, points) = customerService.lookup(customerInstance.phone)            
+            processedCustomer = newcustomer
+            redirect(action: 'profile', id: processedCustomer.phone)
+            return
+        }
+        // Existing customer: show welcome view
+        processedCustomer.awardPoints = processedCustomer.awards?.size() ?: 0
+        render(view: 'welcome', model: [customer: processedCustomer])
     }
 
     // Render the customer profile view by phone number.
