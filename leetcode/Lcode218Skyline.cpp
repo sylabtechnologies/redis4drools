@@ -9,14 +9,22 @@
 using namespace std;
 
 class Interval {
+private:
     int start;
     int end;
+    int height;
+
+    friend class IntervalTree;
 
 public:
-    Interval(int start, int end) : start(start), end(end) {}
+    Interval() : start(0), end(0), height(0) {}
+    Interval(int start, int end, int height) : start(start), end(end), height(height) {}
 
     int getStart() const { return start; }
     int getEnd() const { return end; }
+    int getHeight() const { return height; }
+
+    int getLength() const { return end - start; }
 
     bool overlaps(const Interval &i) const {
         if (this->end < i.start) return false;
@@ -33,33 +41,104 @@ public:
     }
 
     string to_string() const {
-        return "[" + std::to_string(this->start) + "," + std::to_string(this->end) + "]";
+        return "[" + std::to_string(this->start) + "," + std::to_string(this->end) + "," + std::to_string(this->height) + "]";
     }
 
     Interval merge(const Interval &next) const {
         int nstart = min(this->start, next.start);
         int nend = max(this->end, next.end);
-        return Interval(nstart, nend);
-    }
-
-    bool operator<(const Interval &ii) const {
-        if (this->overlaps(ii))
-            throw invalid_argument("overlapping");
-
-        if (this->start < ii.start) return true;
-        if (this->start > ii.start) return false;
-        if (this->start < ii.start) return true;
-        if (this->start > ii.start) return false;
-
-        throw invalid_argument("overlapping again");
+        return Interval(nstart, nend, this->height);
     }
 };
 
+typedef map<int, Interval> Intervals;
+
+// Map by lefts endpoints OPTIMIZE FOR BST/MEMORY LATER
+class IntervalTree {
+public:
+    void insert(Interval &newInter) {
+        int newleft = newInter.start;
+
+        Intervals overlaps;
+        findOverlaps(overlaps, newInter);
+        if (overlaps.size() == 0) {
+             lefts.emplace(newleft, newInter);
+             return;
+        }
+
+        // shadow new interval from the other higher intervals
+        vector<Interval> shadows;
+        Interval* restartWith = nullptr;
+        for (const auto& kv : overlaps) {
+            const Interval& shadow = kv.second;
+
+            // total shadow
+            if (shadow.contains(newInter)) return;
+
+            if (newInter.contains(shadow)) {
+                restartWith = new Interval(shadow.end, newInter.end, newInter.height);
+                newInter.end = shadow.start;
+                this->addToTree(newInter);
+                break;
+            }
+
+            // go left
+            if (shadow.end > newInter.end)
+            {
+                newInter.end = shadow.start;
+            }
+            else if (shadow.start < newInter.start)     // go right
+            {
+                newInter.start = shadow.end;
+            }
+
+            if (newInter.getLength() == 0) break;
+        }
+
+        if (restartWith != nullptr)
+            this->insert(*restartWith);
+        else
+            this->addToTree(newInter);
+
+        return;
+    }
+
+    // Iterator access
+    auto begin() { return lefts.begin(); }
+    auto end() { return lefts.end(); }
+
+private:
+    Intervals lefts;
+
+    void addToTree(Interval &newInter) {
+        if (newInter.getLength() != 0)
+        {
+            lefts.emplace(newInter.start, newInter);
+        }
+    }
+
+    void findOverlaps(Intervals& result, const Interval &iv) const {
+        // Start iterator at closest left endpoint to iv.start
+        auto it = lefts.lower_bound(iv.start);
+        if (it != lefts.begin() && (it == lefts.end() || it->first != iv.start)) {
+            --it;
+        }
+        for (; it != lefts.end(); ++it) {
+            if (it->second.end < iv.start) continue; // skip lefties
+            
+            if (it->second.overlaps(iv)) {
+                result[it->first] = it->second;
+            }
+
+            if (it->second.start > iv.end) break;
+        }
+    }
+};
+
+void mergeIntervals(list<Interval>& mergedIntervals, pair<unordered_multimap<int, Interval>::const_iterator, unordered_multimap<int, Interval>::const_iterator> range);
+
 class Solution {
 public:
-    const int MY_MAX =  2147483640;
-    const int MY_MIN = -2147483640;
-
     vector<vector<int>> getSkyline(vector<vector<int>>& buildings) {
         vector<vector<int>> answer;
         if (buildings.empty()) return answer;
@@ -67,155 +146,107 @@ public:
         // insert all buildings by a level
         unordered_multimap<int, Interval> levels;
         for (const auto& b : buildings) {
-            auto interval = Interval(b[0], b[1]);
+            auto interval = Interval(b[0], b[1], b[2]);
             levels.insert({b[2], interval});            
         }
 
-        set<int> heights_set;
+        // start w/ waterline
+        IntervalTree skyline;
+        // sort heights
+        set<int> heights;
         for (const auto& kv : levels)
-            heights_set.insert(kv.first);
-        vector<int> heights(heights_set.rbegin(), heights_set.rend());
-        trace(heights);
-
-        set<Interval> groundLevel;
-        groundLevel.insert(Interval(MY_MIN, MY_MAX));
+            heights.insert(kv.first);
 
         // iterate over levels in descending order
-        for (const int &height : heights) {
-            auto current_level = vector<Interval>();
+        for (auto it = heights.crbegin(); it != heights.crend(); ++it) {
+            int height = *it;
+            cout << "at height " << height << endl;
+
+            // merge all intervals at this height
+            list<Interval> mergedIntervals;
             auto range = levels.equal_range(height);
-            for (auto it = range.first; it != range.second; ++it) {
-                current_level.push_back(it->second);
-            }
-            // sort
-            try {
-                sort(current_level.begin(), current_level.end());
-            }
-            catch (const invalid_argument &e) {
-                cout << "exit w/ invalid argument";
-                exit(1);
+            mergeIntervals(mergedIntervals, range);
+
+            for (auto it = mergedIntervals.begin(); it != mergedIntervals.end(); ++it) {
+                auto myInterval = *it;
+                skyline.insert(myInterval);
             }
 
-            // trace
-            cout << "at level " << height << ": ";
-            trace(current_level);
-
-            merge_intervals(current_level);
-            cout << "after merge at " << height << ": ";
-            trace(current_level);
-
-            auto solved = vector<Interval>();
-            // iterate over current level, find overlaps
-            for(const auto& current_top : current_level) {
-
-                auto overlaps = list<Interval>();
-                bool first_found = false;
-                Interval first = Interval(0,0);
-
-                for (auto it = groundLevel.begin(); it != groundLevel.end(); ++it) {
-                    if (it->overlaps(current_top) || it->getEnd() <= current_top.getStart()) {
-                        first = Interval(it->getStart(), it->getEnd());
-                        first_found = true;
-                        break;
-                    }
-                }
-
-                if (first_found && first.overlaps(current_top))
-                    overlaps.push_back(first);
-
-                for (auto it = groundLevel.rbegin(); it != groundLevel.rend(); ++it) {
-                    if (it->getStart() > current_top.getEnd())
-                        break;
-                                            
-                    overlaps.push_back(*it);
-                }
-
-                // Remove adjacent duplicates from overlaps
-                for (auto it = overlaps.begin(); it != overlaps.end(); ) {
-                    auto next = it;
-                    ++next;
-                    if (next != overlaps.end() && it->equals(*next)) {
-                        it = overlaps.erase(next);
-                    } else {
-                        ++it;
-                    }
-                }
-
-                // TODO - make a structure to keep sorted intervals
-                for (auto it = overlaps.begin(); it != overlaps.end(); ++it) {
-                    Interval test = Interval(it->getStart(), it->getEnd());
-
-                    if (!test.overlaps(current_top)) continue;
-                    if (test.getEnd() == current_top.getStart()|| current_top.getEnd() == test.getStart()) continue;
-
-                    groundLevel.erase(test);
-
-                    if (current_top.contains(test) || current_top.equals(test)) {
-                        solved.push_back(Interval(test.getStart(), test.getEnd()));
-                    }
-                    else if (test.contains(current_top))
-                    {
-                        if (test.getStart() != current_top.getStart())
-                            groundLevel.insert(Interval(test.getStart(), current_top.getStart()));
-                        if (test.getEnd() != current_top.getEnd())
-                            groundLevel.insert(Interval(current_top.getEnd(), test.getEnd()));
-                        solved.push_back(current_top);
-                    }
-                    else if (test.getEnd() < current_top.getEnd()) {
-                        solved.push_back(Interval(current_top.getStart(), test.getEnd()));
-                        groundLevel.insert(Interval(test.getStart(), current_top.getStart()));
-                    }
-                    else { // current_top.end > test.end
-                        solved.push_back(Interval(test.getStart(), current_top.getEnd()));
-                        groundLevel.insert(Interval(current_top.getEnd(), test.getEnd()));
-                    }
-                }
-
-            }
-
-            cout << "solved now " << height << ": ";
-            trace(solved);
+            // cout << "skyline: " ;
+            // for(auto it = skyline.begin(); it != skyline.end(); ++it) {
+            //     cout << it->second.to_string() << " ";
+            // }
+            // cout << endl;
         }
 
-        return vector<vector<int>>();
-    }
-
-private:
-    vector<Interval> merge_intervals(const vector<Interval> &sorted) {
-        list<Interval> res;
-        int i = 0;
-        while (i < (int)sorted.size()) {
-            Interval curr = sorted[i++];
-            int j = i;
-            while (j < (int)sorted.size()) {
-                const Interval &next = sorted[j];
-                if (!curr.overlaps(next)) break;
-                curr = curr.merge(next);
-                i++; j++;
+        // compute solution
+        vector<vector<int>> ret;
+        ret.reserve(500);
+        bool first = true;
+        int last = -1;
+        for(auto it = skyline.begin(); it != skyline.end(); ++it) {
+            Interval current = it->second;
+            last = current.getEnd();
+            if (first) {
+                ret.push_back({current.getStart(), current.getHeight()});
+                first = false;
+                continue;
             }
-            res.push_back(curr);
-        }
-        return vector<Interval>(res.begin(), res.end());
-    }
 
-    void trace(const vector<int> &v) const {
-        cout << "[";
-        for (size_t i = 0; i < v.size(); i++) {
-            if (i) cout << ", ";
-            cout << v[i];
+            Interval prev = (std::prev(it))->second;
+            if(current.getStart() > prev.getEnd()) {
+                // glue
+                ret.push_back({prev.getEnd(), 0});
+            }
+            ret.push_back({current.getStart(), current.getHeight()});
         }
-        cout << "]" << endl;
-    }
+        ret.push_back({last, 0});
 
-    void trace(const vector<Interval> &iv) const {
-        for (size_t i = 0; i < iv.size(); i++) {
-            if (i) cout << " ";
-            cout << iv[i].to_string();
-        }
-        cout << endl;
+        return ret;
     }
-
 };
+
+void mergeIntervals(list<Interval>& mergedIntervals,
+    pair<unordered_multimap<int, Interval>::const_iterator, unordered_multimap<int, Interval>::const_iterator> range) {
+
+    // merge by left endpoint
+    Intervals currentLevel;
+    for (auto it = range.first; it != range.second; ++it) {
+        const Interval& interval = it->second;
+        const int start = interval.getStart();
+
+        if (currentLevel.find(it->second.getStart()) == currentLevel.end()) {
+            currentLevel[start] = interval;
+            continue;
+        }
+
+        auto existing = currentLevel[start];
+        if (interval.contains(existing)) continue;
+
+        currentLevel[start] = interval;
+    }
+
+    // move to list
+    mergedIntervals.clear();
+    for (auto it = currentLevel.cbegin(); it != currentLevel.cend(); ++it)
+    {
+        mergedIntervals.push_back(it->second);
+    }
+
+    // clear overlaps
+    for (auto it = mergedIntervals.begin(); it != mergedIntervals.end(); ) {
+        auto current = *it;
+        auto nextIt = std::next(it);
+        if (nextIt == mergedIntervals.end()) break;
+        if (current.overlaps(*nextIt)) {
+            Interval merged = current.merge(*nextIt);
+            *nextIt = merged;
+            it = mergedIntervals.erase(it); // erase returns the next valid iterator
+        } else {
+            ++it;
+        }
+    }
+}
 
 int main() {
     Solution solution;
