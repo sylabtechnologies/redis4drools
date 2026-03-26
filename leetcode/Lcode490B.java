@@ -1,6 +1,6 @@
 import java.util.HashMap;
 
-// https://leetcode.com/problems/find-the-score-difference-in-a-game/description/
+// https://leetcode.com/problems/check-digitorial-permutation/
 public class Lcode490B {
     public static void main(String[] args) {
         Solution solution = new Solution();
