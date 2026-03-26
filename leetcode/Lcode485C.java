@@ -19,77 +19,81 @@ public class Lcode485C {
 }
 
 class AuctionSystem {
-    HashSet<Integer> users;
-    HashSet<Integer> items;
-    HashMap<Integer, HashMap<Integer, Integer>> bids; // itemId -> (userId -> bidAmount)
+
+    // Helper class to track an item's bids cleanly
+    private class ItemAuction {
+        HashMap<Integer, Integer> userBids = new HashMap<>();
+        TreeMap<Integer, TreeSet<Integer>> amountToUsers = new TreeMap<>();
+
+        public void addOrUpdate(int userId, int bidAmount) {
+            // If the user already has a bid, we must remove it from the TreeMap first
+            if (userBids.containsKey(userId)) {
+                removeUser(userId);
+            }
+
+            // 1. Add to the standard HashMap
+            userBids.put(userId, bidAmount);
+
+            // 2. Add to the TreeMap
+            amountToUsers.putIfAbsent(bidAmount, new TreeSet<>());
+            amountToUsers.get(bidAmount).add(userId);
+        }
+
+        public void removeUser(int userId) {
+            Integer oldAmount = userBids.remove(userId);
+            if (oldAmount != null) {
+                // Remove the user from the TreeSet
+                TreeSet<Integer> usersWithBid = amountToUsers.get(oldAmount);
+                usersWithBid.remove(userId);
+
+                // If no one else has this bid amount, clean up the TreeMap
+                if (usersWithBid.isEmpty()) {
+                    amountToUsers.remove(oldAmount);
+                }
+            }
+        }
+        
+        public int getHighestBidder() {
+            if (amountToUsers.isEmpty()) {
+                return -1;
+            }
+            // lastEntry() gets the highest bid amount in O(log M) or O(1) time
+            // last() gets the highest userId in that bid amount to break ties
+            return amountToUsers.lastEntry().getValue().last();
+        }
+    }
+
+    // itemId -> ItemAuction
+    private HashMap<Integer, ItemAuction> auctions;
 
     public AuctionSystem() {
-        users = new HashSet<>();
-        items = new HashSet<>();
-        bids = new HashMap<>();
+        auctions = new HashMap<>();
     }
-    
-    public void addBid(int userId, int itemId, int bidAmount) {
-        users.add(userId);
-        items.add(itemId);
-        var bidsForItem = bids.get(itemId);
-        if (bidsForItem == null) {
-            bidsForItem = new HashMap<>();
-            bidsForItem.put(userId, bidAmount);
-            bids.put(itemId, bidsForItem);
-        }
-        else {
-            bidsForItem.put(userId, bidAmount);
-        }
 
-        System.out.println(bids);
+    public void addBid(int userId, int itemId, int bidAmount) {
+        auctions.putIfAbsent(itemId, new ItemAuction());
+        auctions.get(itemId).addOrUpdate(userId, bidAmount);
     }
 
     public void updateBid(int userId, int itemId, int newAmount) {
-        var bidsForItem = bids.get(itemId);
-        bidsForItem.put(userId, newAmount);
-
-        System.out.println(bids);
+        ItemAuction auction = auctions.get(itemId);
+        if (auction != null && auction.userBids.containsKey(userId)) {
+            auction.addOrUpdate(userId, newAmount);
+        }
     }
-    
+
     public void removeBid(int userId, int itemId) {
-        var bidsForItem = bids.get(itemId);
-        bidsForItem.remove(userId);        
-
-        System.out.println(bids);
+        ItemAuction auction = auctions.get(itemId);
+        if (auction != null) {
+            auction.removeUser(userId);
+        }
     }
-    
+
     public int getHighestBidder(int itemId) {
-        var bidsForItem = bids.get(itemId);
-        if (bidsForItem == null) {
+        ItemAuction auction = auctions.get(itemId);
+        if (auction == null) {
             return -1;
         }
-
-        int count = 0;
-        int maxBid = -1;
-        int maxUser = -1;
-        for (var entry : bidsForItem.entrySet()) {
-            count++;
-
-            if (count == 1) { // first one only
-                maxUser = entry.getKey();
-                maxBid = entry.getValue();
-                continue;
-            }
-
-            if (entry.getValue() == maxBid) {
-                maxUser = Math.max(entry.getKey(), maxUser);
-            }
-            else if (entry.getValue() > maxBid) {
-                maxUser = entry.getKey();
-                maxBid = entry.getValue();
-            }
-        }
-
-
-        System.out.println(bids);
-        System.out.println(maxUser);
-
-        return maxUser;
+        return auction.getHighestBidder();
     }
 }
