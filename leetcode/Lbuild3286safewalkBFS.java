@@ -25,16 +25,26 @@ public class Lbuild3286safewalk {
 class Solution {
 
     public boolean findSafeWalk(List<List<Integer>> grid, int healthPoints) {
-        return findMinCost(grid) < healthPoints;
-    }
-
-    public int findMinCost(List<List<Integer>> grid) {
         if (grid == null || grid.isEmpty() || grid.get(0).isEmpty()) {
-            return 0;
+            return false;
         }
 
         int rows = grid.size();
         int cols = grid.get(0).size();
+        int[][] intGrid = new int[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            List<Integer> row = grid.get(i);
+            for (int j = 0; j < cols; j++) {
+                intGrid[i][j] = row.get(j);
+            }
+        }
+
+        return findMinCost(intGrid) < healthPoints;
+    }
+
+    public int findMinCost(int[][] grid) {
+        int rows = grid.length;
+        int cols = grid[0].length;
 
         // 1. Initialize the static bounds for our Point class
         Point.maxX = rows;
@@ -54,7 +64,7 @@ class Solution {
         deque.addFirst(start);
         
         // The starting cost is whatever value is at grid[0][0]
-        dist[0][0] = grid.get(0).get(0);
+        dist[0][0] = grid[0][0];
 
         // 4. Run the BFS
         while (!deque.isEmpty()) {
@@ -71,7 +81,7 @@ class Solution {
             for (Point neighbor : Point.getNeighbors(current)) {
                 int nx = neighbor.x;
                 int ny = neighbor.y;
-                int weight = grid.get(nx).get(ny);
+                int weight = grid[nx][ny];
 
                 // If we found a strictly shorter path to this neighbor
                 if (dist[cx][cy] + weight < dist[nx][ny]) {
