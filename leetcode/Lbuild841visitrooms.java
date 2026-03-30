@@ -21,29 +21,23 @@ public class Lbuild841visitrooms {
 
 class Solution {
     public boolean canVisitAllRooms(List<List<Integer>> rooms) {
-        Set<Integer> visited = new HashSet<>();
-        Set<Integer> canVisit = new HashSet<>();
+        boolean[] visited = new boolean[rooms.size()];
+        Deque<Integer> canVisit = new LinkedList<>();
         canVisit.add(0);
 
+        int visitCount = 0;
         while (!canVisit.isEmpty()) {
-            Set<Integer> nextVisit = new HashSet<>();
+            var  room = canVisit.poll();
+            if (visited[room]) continue;
 
-            for (Integer room : canVisit) {
-                if (visited.contains(room)) {
-                    continue;
-                }
+            visited[room] = true;
+            visitCount++;
 
-                visited.add(room);
-
-                // append keys in this room to nextVisit
-                for (Integer key : rooms.get(room)) {
-                        nextVisit.add(key);
-                }
+            for (Integer key : rooms.get(room)) {
+                canVisit.addLast(key);
             }
-
-            canVisit = nextVisit;
         }
 
-        return visited.size() == rooms.size();        
+        return visitCount == rooms.size();
     }
 }
