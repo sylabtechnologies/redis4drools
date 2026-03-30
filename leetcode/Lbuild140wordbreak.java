@@ -4,8 +4,8 @@ public class Lbuild140wordbreak {
     public static void main(String[] args) {
         Solution solution = new Solution();
 
-        String s = "catsanddog";
-        List<String> wordDict = Arrays.asList("cat","cats","and","sand","dog");
+        String s = "ab";
+        List<String> wordDict = Arrays.asList("a","b");
         var result = solution.wordBreak(s, wordDict);
         System.out.println("result: " + result);
     }
@@ -34,16 +34,12 @@ class Solution {
             var elem = queue.removeFirst();
             var start = elem.startsAt();
 
-            System.out.println("working on: " + elem.word());
-
             int letterCount = 0;
             streamChecker.clear();
             for (char c : s.substring(start).toCharArray()) {
                 letterCount++;
                 var nextWord = streamChecker.query(c);
-                if (nextWord != null) {
-                    System.out.println("found word: " + nextWord);
-
+                if (nextWord != null && letterCount == nextWord.length()) {
                     int weAreAt = start + nextWord.length();
                     WordNode child = new WordNode(nextWord, weAreAt, elem);
 
@@ -62,9 +58,32 @@ class Solution {
                     }
                 }
             }
-
         }
+
+        // // traverse the tree
+        // printMe(root);
+
         return answer;
+    }
+
+    void printMe(WordNode node) {
+        if (node.parent() == null) {
+            System.out.println("ROOT");
+
+            for (var child : node.children()) {
+                printMe(child);
+            }
+            return;
+        }
+
+        for (int i = 0; i < node.startsAt(); i++)
+            System.out.print(" ");
+
+        System.out.println(node.word());
+        for (var child : node.children()) {
+            printMe(child);
+        }
+
     }
 
     private String traverseWordTree(WordNode node) {
@@ -138,8 +157,11 @@ class StreamChecker
             TrieNode current = queue.poll();
             if (current.children[letter-'a'] != null)
             {
-                if (current.children[letter-'a'].word != null)
-                    foundWord = current.children[letter-'a'].word;
+                if (current.children[letter-'a'].word != null) {
+                    if (foundWord == null || current.children[letter-'a'].word.length() > foundWord.length()) {
+                        foundWord = current.children[letter-'a'].word;
+                    }
+                }
                 queue.add(current.children[letter-'a']);
             }
             i++;
@@ -147,8 +169,11 @@ class StreamChecker
     
         if (root.children[letter-'a'] != null)
         {
-            if (root.children[letter-'a'].word != null) 
-                foundWord = root.children[letter-'a'].word;
+            if (root.children[letter-'a'].word != null) {
+                if (foundWord == null || root.children[letter-'a'].word.length() > foundWord.length()) {
+                    foundWord = root.children[letter-'a'].word;
+                }
+            }
             queue.add(root.children[letter-'a']);
         }
 
