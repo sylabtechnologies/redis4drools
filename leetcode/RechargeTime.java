@@ -9,30 +9,13 @@ public class RechargeTime {
         int[] recharges = {10, 10, 10}; // High recharge logic
         long t = 40;
 
-        System.out.println("Total Usages: " + countUsages(caps, recharges, t));
+        Solution solution = new Solution();
+        System.out.println("Total Usages: " + solution.countUsages(caps, recharges, t));
     }
+}
 
-    
-    static class Battery {
-        int id;
-        int capacity;
-        int rechargeTime;
-        long availableAt;
-
-        public Battery(int id, int capacity, int rechargeTime) {
-            this.id = id;
-            this.capacity = capacity;
-            this.rechargeTime = rechargeTime;
-            this.availableAt = 0;
-        }
-
-        @Override
-        public String toString() {
-            return "Battery{id=" + id + ", cap=" + capacity + ", recharge=" + rechargeTime + ", availableAt=" + availableAt + "}";
-        }
-    }
-
-    public static int countUsages(int[] capacities, int[] rechargeTimes, long targetTime) {
+class Solution {
+    public int countUsages(int[] capacities, int[] rechargeTimes, long targetTime) {
         int n = capacities.length;
         Deque<Battery> queue = new ArrayDeque<>();
         
@@ -90,12 +73,31 @@ public class RechargeTime {
     }
 
     // Helper to manage the TreeMap counter
-    private static void removeTime(TreeMap<Long, Integer> map, long time) {
+    private void removeTime(TreeMap<Long, Integer> map, long time) {
         int count = map.get(time);
         if (count == 1) {
             map.remove(time);
         } else {
             map.put(time, count - 1);
         }
+    }
+}
+
+class Battery {
+    int id;
+    int capacity;
+    int rechargeTime;
+    long availableAt;
+
+    public Battery(int id, int capacity, int rechargeTime) {
+        this.id = id;
+        this.capacity = capacity;
+        this.rechargeTime = rechargeTime;
+        this.availableAt = 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Battery{id=" + id + ", cap=" + capacity + ", recharge=" + rechargeTime + ", availableAt=" + availableAt + "}";
     }
 }
