@@ -20,29 +20,26 @@ public class Lbuild3885eventmanager {
 }
 
 class EventManager {
-    PriorityQueue<Event> q;
-    HashMap<Integer, Event> events;
+    PriorityQueue<Event> q; //todo - replace this w/ faster tree map
+    HashMap<Long, Event> events;
 
     public EventManager(int[][] eventsArr) {
         this.q = new PriorityQueue<>(
             (a, b) ->(b.pri() != a.pri() ?
-                Integer.compare(b.pri(), a.pri()) :
-                Integer.compare(a.id(), b.id()))
+                Long.compare(b.pri(), a.pri()) :
+                Long.compare(a.id(), b.id()))
         );
         this.events = new HashMap<>();
 
         for (var e : eventsArr) {
             var myEvent = new Event(e[1], e[0]);
-            this.events.put(e[0], myEvent);
+            this.events.put(new Long(e[0]), myEvent);
             this.q.add(myEvent);
         }
-    
-        System.out.println(this.events);
-        System.out.println(this.q);
 
     }
     
-    public void updatePriority(int eventId, int newPriority) {
+    public void updatePriority(long eventId, long newPriority) {
         var oldone = this.events.get(eventId);
         var replacer = new Event(newPriority, eventId);
        
@@ -50,20 +47,15 @@ class EventManager {
         this.events.remove(eventId);
         this.events.put(eventId, replacer);
         this.q.add(replacer);
-
-        System.out.println(this.events);
-        System.out.println(this.q);
     }
     
     public int pollHighest() {
-        System.out.println(this.events);
-        System.out.println(this.q);
         if (this.q.isEmpty()) {
             return -1;
         }
-        return q.poll().id();
+        return (int) q.poll().id();
     }
 }
 
-record Event(Integer pri, Integer id) {}
+record Event(long pri, long id) {}
 
