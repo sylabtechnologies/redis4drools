@@ -1,5 +1,5 @@
 /*
-3875. Parity of an Array; always true
+    3875. Parity of an Array; the minority can alswys be flipped to the majority parity
 */
 
 class Solution {
