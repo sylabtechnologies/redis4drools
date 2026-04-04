@@ -1,6 +1,8 @@
 import java.util.*;
 
-public class digits {
+// https://leetcode.com/problems/concatenate-non-zero-digits-and-multiply-by-sum-i
+
+public class L3754digits {
     public static void main(String[] args) {
         Solution sol = new Solution();
         int n = 10203004; // Example input
@@ -15,15 +17,20 @@ class Solution {
             return 0;
         }
 
-        long ans = n;
-        int sum = 0;
+        StringBuilder ans = new StringBuilder();
+        long sum = 0;
         while (n > 0) {
             int digit = n % 10;
             n /= 10;
-            if (digit == 0) continue;
-            sum += digit;
+
+            if (digit != 0) {
+                sum += digit;
+                ans.insert(0, digit);
+            }
+
+            // System.out.println("Current digit: " + digit + ", Sum: " + sum + ", Ans: " + ans);
         }
 
-        return sum * ans;
+        return sum * Integer.parseInt(ans.toString());
     }
 }
