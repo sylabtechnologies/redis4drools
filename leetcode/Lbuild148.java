@@ -47,7 +47,7 @@ class Solution {
             slow = slow.next;
             fast = fast.next.next;
         }
-        // and cut
+        // & cut
         prev.next = null;
 
         var leftPart = mergeSort(head);
@@ -71,6 +71,7 @@ class Solution {
             current = current.next;
         }
 
+        // append the leftover
         if (left != null) {
             current.next = left;
         } else {
