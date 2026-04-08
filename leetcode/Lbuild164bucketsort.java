@@ -28,65 +28,47 @@ class Solution {
         if (lowbucket == hibucket) return 0;
 
         // create buckets
-        TreeMap<Integer, List<Integer>> buckets = new TreeMap<>();
-        int bucketNo = Integer.MIN_VALUE;
+        BucketMinMax[] buckets = new BucketMinMax[n];
+        for (int i = 0; i < n; i++) {
+            buckets[i] = new BucketMinMax();
+        }
+
+        int bucketNo = 0;
         for (var x : nums) {
             if (x == hibucket) 
-                bucketNo = n - 2;
+                bucketNo = n - 1;
             else {
                 bucketNo = (int) (((long) x - lowbucket) * (n - 1) / (hibucket - lowbucket));
             }
 
-            List<Integer> bucket = buckets.get(bucketNo);
-            if (bucket == null) {
-                bucket = new ArrayList<>();
-                buckets.put(bucketNo, bucket);
-            }
-            bucket.add(x);
+            buckets[bucketNo].min = Math.min(buckets[bucketNo].min, x);
+            buckets[bucketNo].max = Math.max(buckets[bucketNo].max, x);
+            buckets[bucketNo].used = true;
         }
 
-        long gap = Integer.MIN_VALUE;
-        boolean firstTime = true;
-        int prevMin = Integer.MAX_VALUE;
-        int prevMax = Integer.MIN_VALUE;
+        long gap = 0;
+        int prevMax = lowbucket;
 
-        for (int i = 0; i < n - 1; i++) {
-            var bucket = buckets.get(i);
-            // System.out.println("bucketNo: " + i + " bucket: " + bucket);;
-            if (bucket == null) continue;
+        for (int i = 0; i < n; i++) {
+            if (!buckets[i].used) continue;
             
-            var maxmin = maxmin(bucket);
-            if (firstTime) {
-                prevMax = maxmin[0];
-                prevMin = maxmin[1];
-                firstTime = false;
-                continue;
-            }
-
-            var bucketMax = maxmin[0];
-            var bucketMin = maxmin[1];
-            gap = Math.max(gap, (long) bucketMin - prevMax);
-            prevMax = maxmin[0];
-            prevMin = maxmin[1];
+            gap = Math.max(gap, (long) buckets[i].min - prevMax);
+            prevMax = buckets[i].max;
         }
 
         return (int) gap;
+    }
+
+    class BucketMinMax {
+        boolean used = false;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
     }
 
     private int[] maxmin(int[] arr) {
         int max = Integer.MIN_VALUE;
         int min = Integer.MAX_VALUE;
         for (int x : arr) {
-            max = Math.max(max, x);
-            min = Math.min(min, x);
-        }
-        return new int[]{max, min};
-    }
-
-    private int[] maxmin(List<Integer> list) {
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
-        for (int x : list) {
             max = Math.max(max, x);
             min = Math.min(min, x);
         }
