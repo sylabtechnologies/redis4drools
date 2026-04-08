@@ -29,9 +29,6 @@ class Solution {
 
         // create buckets
         BucketMinMax[] buckets = new BucketMinMax[n];
-        for (int i = 0; i < n; i++) {
-            buckets[i] = new BucketMinMax();
-        }
 
         int bucketNo = 0;
         for (var x : nums) {
@@ -41,16 +38,18 @@ class Solution {
                 bucketNo = (int) (((long) x - lowbucket) * (n - 1) / (hibucket - lowbucket));
             }
 
+            if (buckets[bucketNo] == null) {
+                buckets[bucketNo] = new BucketMinMax();
+            }
             buckets[bucketNo].min = Math.min(buckets[bucketNo].min, x);
             buckets[bucketNo].max = Math.max(buckets[bucketNo].max, x);
-            buckets[bucketNo].used = true;
         }
 
         long gap = 0;
         int prevMax = lowbucket;
 
         for (int i = 0; i < n; i++) {
-            if (!buckets[i].used) continue;
+            if (buckets[i] == null) continue;
             
             gap = Math.max(gap, (long) buckets[i].min - prevMax);
             prevMax = buckets[i].max;
@@ -60,7 +59,6 @@ class Solution {
     }
 
     class BucketMinMax {
-        boolean used = false;
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
     }
