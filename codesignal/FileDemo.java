@@ -120,7 +120,7 @@ class MyFile {
         // System.out.println(this);
     }
 
-    public static badPath(String path) {
+    public static boolean badPath(String path) {
         return path == null || path.isBlank() || path.charAt(path.length() - 1) != '/';
     }
 
