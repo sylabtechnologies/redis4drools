@@ -69,7 +69,7 @@ class FileSys {
         var file = new MyFile(filename);
         if (!storage.contains(file)) return false;
 
-        if (path == null || path.isBlank() || path.charAt(path.length() - 1) != '/')  throw new IllegalArgumentException("invalid path");
+        if (MyFile.badPath(path))  throw new IllegalArgumentException("invalid path");
 
         var newfile = new MyFile(path + file.name);
         return storage.add(newfile);
@@ -79,7 +79,7 @@ class FileSys {
         var fileToMove = new MyFile(filename);
         if (!storage.contains(fileToMove)) return false;
         
-        if (path == null || path.isBlank() || path.charAt(path.length() - 1) != '/')  throw new IllegalArgumentException("invalid path");
+        if (MyFile.badPath(path))  throw new IllegalArgumentException("invalid path");
         var newFile = new MyFile(path + fileToMove.name);
         if (storage.contains(newFile)) {
             System.out.println("cannot move itself");
@@ -118,6 +118,10 @@ class MyFile {
         this.path = fullname.substring(0, indexOfSlash + 1);
         this.name = fullname.substring(indexOfSlash + 1);
         // System.out.println(this);
+    }
+
+    public static badPath(String path) {
+        return path == null || path.isBlank() || path.charAt(path.length() - 1) != '/';
     }
 
     @Override
