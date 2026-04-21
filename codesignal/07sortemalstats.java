@@ -17,7 +17,7 @@ public class App {
             users.put(email, count);
         }
         
-        TreeMap<Integer, ArrayList<String>> countList = new TreeMap<>();
+        TreeMap<Integer, ArrayList<String>> countList = new TreeMap<>(Collections.reverseOrder());
         for (var entry : users.entrySet()) {
             var user  = entry.getKey(); 
             var count = entry.getValue(); 
@@ -28,7 +28,7 @@ public class App {
         }
 
         ArrayList<String> ret = new ArrayList<>(200);
-        for (var entry : countList.descendingMap().entrySet()) {
+        for (var entry : countList.entrySet()) {
             var count = entry.getKey();
             var valuesArray = entry.getValue();
             Collections.sort(valuesArray);  // sort the small patches only
