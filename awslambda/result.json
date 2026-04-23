@@ -1,0 +1,221 @@
+{
+    "label_count": 17,
+    "labels": [
+        {
+            "name": "Grass",
+            "confidence": 99.7103271484375,
+            "parents": [
+                "Plant"
+            ],
+            "instances": [],
+            "categories": [
+                "Plants and Flowers"
+            ]
+        },
+        {
+            "name": "Plant",
+            "confidence": 99.7103271484375,
+            "parents": [],
+            "instances": [],
+            "categories": [
+                "Plants and Flowers"
+            ]
+        },
+        {
+            "name": "Architecture",
+            "confidence": 98.53593444824219,
+            "parents": [],
+            "instances": [],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        },
+        {
+            "name": "Building",
+            "confidence": 98.53593444824219,
+            "parents": [
+                "Architecture"
+            ],
+            "instances": [
+                {
+                    "confidence": 90.03085327148438,
+                    "bbox": {
+                        "Width": 0.8369948267936707,
+                        "Height": 0.892490565776825,
+                        "Left": 0.07182775437831879,
+                        "Top": 0.019088489934802055
+                    }
+                }
+            ],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        },
+        {
+            "name": "Housing",
+            "confidence": 98.53593444824219,
+            "parents": [
+                "Architecture",
+                "Building"
+            ],
+            "instances": [],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        },
+        {
+            "name": "Nature",
+            "confidence": 98.44782257080078,
+            "parents": [
+                "Outdoors"
+            ],
+            "instances": [],
+            "categories": [
+                "Nature and Outdoors"
+            ]
+        },
+        {
+            "name": "Outdoors",
+            "confidence": 98.44782257080078,
+            "parents": [],
+            "instances": [],
+            "categories": [
+                "Nature and Outdoors"
+            ]
+        },
+        {
+            "name": "Scenery",
+            "confidence": 98.44782257080078,
+            "parents": [
+                "Nature",
+                "Outdoors"
+            ],
+            "instances": [],
+            "categories": [
+                "Nature and Outdoors"
+            ]
+        },
+        {
+            "name": "House",
+            "confidence": 94.30462646484375,
+            "parents": [
+                "Architecture",
+                "Building",
+                "Housing"
+            ],
+            "instances": [],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        },
+        {
+            "name": "Manor",
+            "confidence": 86.87837219238281,
+            "parents": [
+                "Architecture",
+                "Building",
+                "House",
+                "Housing"
+            ],
+            "instances": [],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        },
+        {
+            "name": "Water",
+            "confidence": 75.32545471191406,
+            "parents": [],
+            "instances": [],
+            "categories": [
+                "Nature and Outdoors"
+            ]
+        },
+        {
+            "name": "Waterfront",
+            "confidence": 75.32545471191406,
+            "parents": [
+                "Water"
+            ],
+            "instances": [],
+            "categories": [
+                "Nature and Outdoors"
+            ]
+        },
+        {
+            "name": "Lawn",
+            "confidence": 75.13723754882812,
+            "parents": [
+                "Grass",
+                "Plant"
+            ],
+            "instances": [],
+            "categories": [
+                "Home and Indoors"
+            ]
+        },
+        {
+            "name": "Villa",
+            "confidence": 73.12413787841797,
+            "parents": [
+                "Architecture",
+                "Building",
+                "House",
+                "Housing"
+            ],
+            "instances": [],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        },
+        {
+            "name": "Beacon",
+            "confidence": 70.34144592285156,
+            "parents": [
+                "Architecture",
+                "Building",
+                "Tower"
+            ],
+            "instances": [],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        },
+        {
+            "name": "Lighthouse",
+            "confidence": 70.34144592285156,
+            "parents": [
+                "Architecture",
+                "Beacon",
+                "Building",
+                "Tower"
+            ],
+            "instances": [
+                {
+                    "confidence": 70.34144592285156,
+                    "bbox": {
+                        "Width": 0.07313001155853271,
+                        "Height": 0.38314297795295715,
+                        "Left": 0.47548481822013855,
+                        "Top": 0.0
+                    }
+                }
+            ],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        },
+        {
+            "name": "Tower",
+            "confidence": 70.34144592285156,
+            "parents": [
+                "Architecture",
+                "Building"
+            ],
+            "instances": [],
+            "categories": [
+                "Buildings and Architecture"
+            ]
+        }
+    ]
+}
