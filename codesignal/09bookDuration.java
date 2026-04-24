@@ -66,6 +66,8 @@ public class App {
 
 }
 
+// BETTER REFACTOR TO BOOK_BORROW, AND BOOK STATS
+// THEN SCAN & SORT THE CABBAGE PATCH BY ID
 // use time api concepts
 record LibraryTime(int hh, int mm) {}
 record Book(int id, LibraryTime borrowedAt, LibraryTime returnedAt) {}
