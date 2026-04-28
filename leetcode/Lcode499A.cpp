@@ -3,7 +3,7 @@
 #include <list>
 
 // find valid elements
-// https://leetcode.com/problems/valid-elements-in-an-array/description/
+// https://leetcode.com/problems/valid-elements-in-an-array/description/ TOP SPEED!
 
 using namespace std;
 
@@ -14,27 +14,25 @@ public:
         if (n < 1) return {};
 
         int maxSoFar, minSoFar;
-        maxSoFar = minSoFar = nums[0];
+        maxSoFar = nums[0];
 
         // sweep right
         vector<char> isValid(nums.size(), false); // use char vs bool for speed
         isValid[0] = true;
         for (int i = 1; i < n; i++) {
-            if (nums[i] > maxSoFar || nums[i] < minSoFar) {
+            if (nums[i] > maxSoFar) {
                 isValid[i] = true;
                 if (nums[i] > maxSoFar) maxSoFar = nums[i];
-                if (nums[i] < minSoFar) minSoFar = nums[i];
             }
         }
 
         // sweep left
-        maxSoFar = minSoFar = nums[n-1];
+        maxSoFar = nums[n-1];
         isValid[n-1] = true;
         for (int i = n-2; i >= 0; i--) {
-            if (nums[i] > maxSoFar || nums[i] < minSoFar) {
+            if (nums[i] > maxSoFar) {
                 isValid[i] = true;
                 if (nums[i] > maxSoFar) maxSoFar = nums[i];
-                if (nums[i] < minSoFar) minSoFar = nums[i];
             }
         }
 
