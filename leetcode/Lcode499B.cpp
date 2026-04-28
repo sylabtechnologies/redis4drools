@@ -4,7 +4,7 @@
 #include <list>
 
 // freq sort
-// https://leetcode.com/problems/sort-vowels-by-frequenc
+// https://leetcode.com/problems/sort-vowels-by-frequency
 
 using namespace std;
 
