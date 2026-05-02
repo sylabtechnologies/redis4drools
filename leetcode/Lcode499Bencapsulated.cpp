@@ -1,3 +1,6 @@
+// freq sort beats 90%
+// https://leetcode.com/problems/sort-vowels-by-frequency
+
 class Vowel {
     char value;
     int firstOccurrence;
@@ -21,20 +24,17 @@ class Vowel {
         }
 
         static bool isVowel(const char c);
+
+        std::string to_string() const {
+            return std::string("Vowel{value=") + value +
+                   ", firstOccurrence=" + std::to_string(firstOccurrence) +
+                   ", frequency=" + std::to_string(frequency) + "}";
+        }
 };
 
 bool Vowel::isVowel(const char c) {
-    char index = tolower(c) - 'a';
-
-    if (index == 14) {
-        return true;
-    }
-
-    if (index == 16 || index == 24) {
-        return false;
-    }
-
-    return index % 4 == 0;
+    char lc = tolower(c);
+    return lc == 'a' || lc == 'e' || lc == 'i' || lc == 'o' || lc == 'u';
 }
 
 class Solution {
@@ -48,8 +48,6 @@ public:
 
         for (int i = 0; i < s.size(); i++) {
             char c = s[i];
-            std::cout << c << std::endl;
-
             if (Vowel::isVowel(c)) {
                 auto it = myVowels.find(c);
                 if (it == myVowels.end()) {
