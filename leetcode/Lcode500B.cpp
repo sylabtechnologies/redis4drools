@@ -15,13 +15,13 @@ public:
         const int LIMIT = 9999;
         vector<bool> sieve(LIMIT + 1, true);
         sieve[0] = sieve[1] = false;
-        for (int i = 2; i * i <= LIMIT; i++) {
+        for (int i = 2; i * i <= end; i++) {
             if (sieve[i])
-                for (int j = i * i; j <= LIMIT; j += i)
+                for (int j = i * i; j <= end; j += i)
                     sieve[j] = false;
         }
         vector<int> primes;
-        for (int i = 2; i <= LIMIT; i++) {
+        for (int i = 2; i <= end; i++) {
             if (sieve[i]) {
                 if (i < start || i > end) continue;
                 primes.push_back(i);
