@@ -5,6 +5,7 @@
 using namespace std;
 
 // https://leetcode.com/problems/sum-of-primes-between-number-and-its-reverse/
+// NOW IT IS @70%!
 
 #define LOG(x) std::cout << (x) << std::endl
 
@@ -13,16 +14,16 @@ public:
     // Sieve of Eratosthenes: all primes up to 9999
     vector<int> buildPrimes(int start, int end) {
         const int LIMIT = 9999;
-        vector<bool> sieve(LIMIT + 1, true);
-        sieve[0] = sieve[1] = false;
+        char sieve[LIMIT + 1] = {};  // 0 = prime candidate
+        sieve[0] = sieve[1] = 1;  // 0 and 1 are not prime
         for (int i = 2; i * i <= end; i++) {
-            if (sieve[i])
+            if (!sieve[i])
                 for (int j = i * i; j <= end; j += i)
-                    sieve[j] = false;
+                    sieve[j] = 1;  // mark as not prime
         }
         vector<int> primes;
         for (int i = 2; i <= end; i++) {
-            if (sieve[i]) {
+            if (!sieve[i]) {
                 if (i < start || i > end) continue;
                 primes.push_back(i);
             }            
