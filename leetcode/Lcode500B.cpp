@@ -2,6 +2,7 @@
 #include <vector>
 #include <list>
 #include <algorithm>
+#include <array>
 using namespace std;
 
 // https://leetcode.com/problems/sum-of-primes-between-number-and-its-reverse/
@@ -9,24 +10,30 @@ using namespace std;
 
 #define LOG(x) std::cout << (x) << std::endl
 
+// Sieve computed once at compile time for [0, 9999]
+static constexpr int SIEVE_LIMIT = 9999;
+
+static constexpr std::array<bool, SIEVE_LIMIT + 1> buildSieve() {
+    std::array<bool, SIEVE_LIMIT + 1> sieve = {};
+    sieve[0] = sieve[1] = true;  // not prime
+    for (int i = 2; i * i <= SIEVE_LIMIT; i++) {
+        if (!sieve[i])
+            for (int j = i * i; j <= SIEVE_LIMIT; j += i)
+                sieve[j] = true;  // mark as not prime
+    }
+    return sieve;
+}
+
+static constexpr auto SIEVE = buildSieve();  // evaluated at compile time
+
 class Solution {
 public:
-    // Sieve of Eratosthenes: all primes up to 9999
+    // Reads from the compile-time sieve — no runtime computation
     vector<int> buildPrimes(int start, int end) {
-        const int LIMIT = 9999;
-        char sieve[LIMIT + 1] = {};  // 0 = prime candidate
-        sieve[0] = sieve[1] = 1;  // 0 and 1 are not prime
-        for (int i = 2; i * i <= end; i++) {
-            if (!sieve[i])
-                for (int j = i * i; j <= end; j += i)
-                    sieve[j] = 1;  // mark as not prime
-        }
         vector<int> primes;
-        for (int i = 2; i <= end; i++) {
-            if (!sieve[i]) {
-                if (i < start || i > end) continue;
+        for (int i = start; i <= end; i++) {
+            if (i >= 2 && !SIEVE[i])
                 primes.push_back(i);
-            }            
         }
         return primes;
     }
